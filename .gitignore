@@ -1,0 +1,29 @@
+# Python virtual environments
+venv/
+ENV/
+env/
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# Python caches and logs
+*.log
+*.sqlite3
+*.db
+
+# VS Code settings
+.vscode/
+
+# macOS files
+.DS_Store
+
+# Credentials / secrets
+reddit_crypto_dbt/reddit-crypto-sentiment-4591c913e7fc.json
+*.json
+.env
+.env/
+
+# dbt compiled / target folders
+dbt_packages/
+target/

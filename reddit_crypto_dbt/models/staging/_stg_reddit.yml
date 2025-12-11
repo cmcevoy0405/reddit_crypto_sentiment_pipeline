@@ -1,0 +1,20 @@
+models:
+  - name: stg_reddit__posts
+    description: reddit posts from the last day on cryptocurrency sub-reddit  
+    columns:
+      - name: post_id 
+        description: Primary key for this table 
+        tests:
+          - unique
+          - not_null
+  - name: stg_reddit__comments
+    description: reddit comments from the last day on cryptocurrency sub-reddit  
+    columns: 
+      - name: comment_id
+        description: Primary key for this table 
+        tests:
+          - unique
+          - not null
+      - name: link_table 
+        tests:
+          - not_null

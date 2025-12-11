@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: reddit_data           
+    database: reddit-crypto-sentiment  
+    schema: reddit_data
+    tables:
+      - name: raw_reddit_posts
+      - name: raw_reddit_comments
