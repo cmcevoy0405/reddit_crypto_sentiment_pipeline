@@ -7,3 +7,6 @@ sources:
     tables:
       - name: raw_reddit_posts
       - name: raw_reddit_comments
+    schema: crypto_data
+    tables:
+      - name: raw_crypto
