@@ -15,6 +15,15 @@ models:
         tests:
           - unique
           - not null
-      - name: link_table 
+      - name: post_title 
         tests:
           - not_null
+  - name: stg_crypto
+    description: crypto data for top 5 coins, scraped by the hour
+    columns:
+     - name: crypto_id
+       description: Primary key for this table 
+       tests:
+        - unique
+        - not_null
+     
