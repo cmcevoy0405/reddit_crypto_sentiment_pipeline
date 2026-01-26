@@ -1,0 +1,18 @@
+models:
+  - name: dim_crypto
+    description: Dimensions table for crypto 
+    columns:
+      - name: crypto_id 
+        description: Unique column for identifying crypto's
+        tests:
+          - unique
+          - not_null
+models:
+  - name: fct_crypto__price
+    description: price information for eahc hour for each crypto time combination
+    columns:
+      - name: price_id
+        description: Primary key for this table 
+        tests:
+          - unique
+          - not_null
