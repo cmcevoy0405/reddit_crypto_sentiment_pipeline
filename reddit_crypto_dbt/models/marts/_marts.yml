@@ -7,7 +7,6 @@ models:
         tests:
           - unique
           - not_null
-models:
   - name: fct_crypto__price
     description: price information for eahc hour for each crypto time combination
     columns:
