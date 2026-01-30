@@ -1,0 +1,17 @@
+models:
+  - name: int_comment_mentions
+    description: Int layer for counting crypto mentions in comments 
+    columns:
+      - name: comment_id 
+        description: Unique column for identifying comments
+        tests:
+          - unique
+          - not_null
+  - name: int_posts_mentions
+    description: Int layer for counting crypto mentions in posts
+    columns:
+      - name: post_id
+        description: Unique column for identifying posts
+        tests:
+          - unique
+          - not_null

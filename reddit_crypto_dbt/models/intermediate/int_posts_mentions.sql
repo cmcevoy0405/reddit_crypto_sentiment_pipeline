@@ -2,6 +2,7 @@ WITH posts AS(
     SELECT 
         post_id,
         post_time,
+        post_title,
         LOWER(CONCAT(
             COALESCE(post_title, ''),
             ' ',
@@ -13,6 +14,7 @@ WITH posts AS(
  SELECT
     post_id,
     post_time,
+    post_title,
     upvote_ratio,
     full_post_text,
 
