@@ -15,3 +15,11 @@ models:
         tests:
           - unique
           - not_null
+  - name: fct_crypto__mentions
+    description: total count of all mentions grouped by post
+    columns:
+      - name: post_id
+        description: Primary key for this table 
+        tests:
+          - unique
+          - not_null
