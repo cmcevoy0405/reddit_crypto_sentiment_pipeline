@@ -1,6 +1,10 @@
-{{ config(
-    materialized='table'
-) }}
+{{ 
+    config(
+        database='reddit-crypto-sentiment',  
+        schema='reddit_data',                 
+        materialized='view'
+    ) 
+}}
 
 WITH comments AS (
   SELECT

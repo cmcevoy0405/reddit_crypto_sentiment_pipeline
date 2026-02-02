@@ -1,4 +1,10 @@
-{{ config(materialized='view') }}
+{{ 
+    config(
+        database='reddit-crypto-sentiment',  
+        schema='crypto_data',                 
+        materialized='view'
+    ) 
+}}
 
 WITH source as (
     SELECT *

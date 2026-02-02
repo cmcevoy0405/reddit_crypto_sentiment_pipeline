@@ -1,3 +1,11 @@
+{{ 
+    config(
+        database='reddit-crypto-sentiment', 
+        schema='reddit_data',                 
+        materialized='view'
+    ) 
+}}
+
 WITH posts AS(
     SELECT 
         post_id,

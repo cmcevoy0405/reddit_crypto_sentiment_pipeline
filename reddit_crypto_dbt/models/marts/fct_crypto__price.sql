@@ -1,3 +1,11 @@
+{{ 
+    config(
+        database='reddit-crypto-sentiment', 
+        schema='crypto_data',                 
+        materialized='table'
+    ) 
+}}
+
 WITH fact_crypto AS (
     SELECT 
         crypto_id,
