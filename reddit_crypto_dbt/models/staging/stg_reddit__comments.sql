@@ -11,6 +11,7 @@ ranked as(
 )
 SELECT
     TRIM(CAST(id as STRING)) AS comment_id,
+    TRIM(CAST(REGEXP_REPLACE(link_id, r'^t3_', '')as string)) AS post_id,
     TIMESTAMP_SECONDS(CAST(created_utc AS INT64)) AS comment_time,
     TRIM(CAST(author AS STRING)) AS comment_author,
     TRIM(CAST(body AS STRING)) AS comment_text,

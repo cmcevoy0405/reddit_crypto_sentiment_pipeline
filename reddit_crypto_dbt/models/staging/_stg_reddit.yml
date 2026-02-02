@@ -14,7 +14,7 @@ models:
         description: Primary key for this table 
         tests:
           - unique
-          - not null
+          - not_null
       - name: post_title 
         tests:
           - not_null
