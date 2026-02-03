@@ -32,6 +32,9 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   reddit_crypto_dbt:
 
-    staging: {}        # configs will be set per model
-    intermediate: {}   # configs will be set per model
-    marts: {}
+    staging:
+      +dataset: reddit_data       # configs will be set per model
+    intermediate:
+      +dataset: reddit_data  # configs will be set per model
+    marts:
+      +dataset: crypto_data

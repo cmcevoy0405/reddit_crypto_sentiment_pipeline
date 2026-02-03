@@ -47,7 +47,7 @@ headers = {
 all_posts = []
 after_post_id = None
 
-one_hour_ago = datetime.utcnow() - timedelta(hours=24)
+one_day_ago = datetime.utcnow() - timedelta(hours=24)
 
 while True:
     params = {
@@ -64,7 +64,7 @@ while True:
     # Filter posts created in the last hour
     for rec in children:
         post_time = datetime.utcfromtimestamp(rec['data']['created_utc'])
-        if post_time >= one_hour_ago:
+        if post_time >= one_day_ago:
             all_posts.append(rec['data'])
         else:
             # Stop scraping if we hit older posts
@@ -95,7 +95,7 @@ headers = {
 all_comments = []
 after_comment_id = None
 
-one_hour_ago = datetime.utcnow() - timedelta(hours=24)
+one_day_ago = datetime.utcnow() - timedelta(hours=24)
 
 while True:
     params = {
@@ -112,7 +112,7 @@ while True:
     # Filter posts created in the last hour
     for rec in children:
         post_time = datetime.utcfromtimestamp(rec['data']['created_utc'])
-        if post_time >= one_hour_ago:
+        if post_time >= one_day_ago:
             all_comments.append(rec['data'])
         else:
             # Stop scraping if we hit older posts

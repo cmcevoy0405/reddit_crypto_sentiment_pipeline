@@ -9,18 +9,18 @@
 WITH fact_crypto AS (
     SELECT 
         crypto_id,
-        open_hour,
+        DATE_TRUNC(open_hour, HOUR) as hour,
         open,
         high,
         low, 
-        close,
+        close
     FROM {{ref('stg_crypto')}}
 )
 SELECT 
     {{ dbt_utils.generate_surrogate_key
-    (['crypto_id', 'open_hour']) }} as price_id,
+    (['crypto_id', 'hour']) }} as price_id,
     crypto_id,
-    open_hour as open_time,
+    hour,
     open,
     high,
     close
