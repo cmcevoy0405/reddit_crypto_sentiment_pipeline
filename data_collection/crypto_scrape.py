@@ -30,10 +30,27 @@ BASE_URL = "https://api.binance.com/api/v3/klines"
 # -----------------------------
 # FETCH DATA
 # -----------------------------
-def fetch_last_24h(symbol):
-    """Fetch hourly candlesticks for the past 24 hours"""
-    end_time = int(datetime.utcnow().timestamp() * 1000)  # now in ms
-    start_time = int((datetime.utcnow() - timedelta(hours=24)).timestamp() * 1000)  # 24h ago in ms
+def get_latest_timestamp(symbol):
+    query = F"""SELECT 
+                    MAX(open_time) as max_time
+                FROM '{project_id}.{dataset_id}.raw_crypto'
+                WHERE symbol = '{symbol}"""
+    
+    result = client.query(query).result()
+    
+    for row in result:
+        return row.max_time
+    
+def fetch_new_data(symbol):
+    last_timestamp = get_latest_timestamp(symbol)
+
+    if last_timestamp:
+        start_time = int(last_timestamp.timestamp() * 1000)
+    else:
+        # First run → pull 24h
+        start_time = int((datetime.utcnow() - timedelta(hours=24)).timestamp() * 1000)
+
+    end_time = int(datetime.utcnow().timestamp() * 1000)
 
     params = {
         "symbol": symbol,
@@ -59,6 +76,7 @@ def fetch_last_24h(symbol):
             "volume": float(k[5]),
             "number_of_trades": k[8]
         })
+
     return pd.DataFrame(rows)
 
 # -----------------------------
@@ -67,7 +85,7 @@ def fetch_last_24h(symbol):
 def upload_to_bigquery(df):
     table_id = f"{project_id}.{dataset_id}.raw_crypto"
     job_config = bigquery.LoadJobConfig(
-        write_disposition="WRITE_TRUNCATE",  # replace table
+        write_disposition="WRITE_APPEND",  
         autodetect=True
     )
 
@@ -81,12 +99,15 @@ def upload_to_bigquery(df):
 if __name__ == "__main__":
     all_rows = []
     for asset in ASSET:
-        df_asset = fetch_last_24h(asset)
-        all_rows.append(df_asset)
+        df_asset = fetch_new_data(asset)
+        if not df_asset.empty:
+            all_rows.append(df_asset)
 
-    df = pd.concat(all_rows, ignore_index=True)
-    print(df)
-    upload_to_bigquery(df)
+    if all_rows:
+        df = pd.concat(all_rows, ignore_index=True)
+        upload_to_bigquery(df)
+    else:
+        print("No new data to upload.")
 
     
 
