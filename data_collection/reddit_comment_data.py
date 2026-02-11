@@ -33,6 +33,25 @@ def get_safe_url(url, params, retries = 5):
     
     raise Exception("Tried too many times")
 
+def get_latest_post_time():
+    query = f"""
+        SELECT MAX(created_utc) as max_time
+        FROM `{project_id}.{dataset_id}.raw_reddit_posts`
+    """
+    result = client.query(query).result()
+    for row in result:
+        return (row.max_time)
+
+
+def get_latest_comment_time():
+    query = f"""
+        SELECT MAX(created_utc) as max_time
+        FROM `{project_id}.{dataset_id}.raw_reddit_comments`
+    """
+    result = client.query(query).result()
+    for row in result:
+        return row.max_time
+
 # url building for posts dataset
 base_url = 'https://www.reddit.com'
 end_point = '/r/CryptoCurrency/new'
@@ -47,7 +66,13 @@ headers = {
 all_posts = []
 after_post_id = None
 
-one_day_ago = datetime.utcnow() - timedelta(hours=24)
+# Scraping posts we don't have 
+latest_post_time = get_latest_post_time()  # should return float or None
+
+if latest_post_time:
+    one_day_ago = latest_post_time
+else:
+    one_day_ago = (datetime.utcnow() - timedelta(hours=24)).timestamp()
 
 while True:
     params = {
@@ -61,14 +86,12 @@ while True:
     if not children:
         break
 
-    # Filter posts created in the last hour
     for rec in children:
-        post_time = datetime.utcfromtimestamp(rec['data']['created_utc'])
+        post_time = rec['data']['created_utc']  # float, Unix seconds
         if post_time >= one_day_ago:
             all_posts.append(rec['data'])
         else:
-            # Stop scraping if we hit older posts
-            print("Reached posts older than 1 day, stopping...")
+            print("Reached posts older than latest timestamp, stopping...")
             break
     else:
         # Update after_post_id for next page if all posts were recent
@@ -80,6 +103,7 @@ while True:
     break
 
 print(f"Total posts in the last day: {len(all_posts)}")
+
 
 # Url building for comments on subreddit
 url = 'https://www.reddit.com'
@@ -95,7 +119,13 @@ headers = {
 all_comments = []
 after_comment_id = None
 
-one_day_ago = datetime.utcnow() - timedelta(hours=24)
+# Scraping logic for new comments
+latest_comment_time = get_latest_comment_time()
+
+if latest_comment_time:
+    one_day_ago = latest_comment_time
+else:
+     one_day_ago = (datetime.utcnow() - timedelta(hours=24)).timestamp()
 
 while True:
     params = {
@@ -109,17 +139,15 @@ while True:
     if not children:
         break
 
-    # Filter posts created in the last hour
+   
     for rec in children:
-        post_time = datetime.utcfromtimestamp(rec['data']['created_utc'])
-        if post_time >= one_day_ago:
+        comment_time = rec['data']['created_utc']  # float
+        if comment_time >= one_day_ago:
             all_comments.append(rec['data'])
         else:
-            # Stop scraping if we hit older posts
-            print("Reached comments older than 1 hour, stopping...")
+            print("Reached comments older than 24h, stopping...")
             break
     else:
-        # Update after_post_id for next page if all posts were recent
         after_comment_id = data['data']['after']
         if not after_comment_id:
             break
@@ -133,6 +161,9 @@ print(f"Total comments in the last day: {len(all_comments)}")
 post_df = pd.DataFrame(all_posts)
 comment_df = pd.DataFrame(all_comments)
 
+if 'author_cakeday' in post_df.columns:
+    post_df = post_df.drop(columns=['author_cakeday'])
+
 for df in [post_df, comment_df]:
     for col in df.select_dtypes(include=['object']).columns:
         df[col] = df[col].astype(str)
@@ -144,7 +175,7 @@ comment_table_id = f"{project_id}.{dataset_id}.raw_reddit_comments"
 post_job = client.load_table_from_dataframe(
     post_df,
     post_table_id,
-    job_config=bigquery.LoadJobConfig(write_disposition = 'WRITE_TRUNCATE')
+    job_config=bigquery.LoadJobConfig(write_disposition = 'WRITE_APPEND')
 )
 post_job.result()
 print(f"Uploaded {len(post_df)} posts to {post_table_id}")
@@ -152,7 +183,8 @@ print(f"Uploaded {len(post_df)} posts to {post_table_id}")
 comment_job = client.load_table_from_dataframe(
     comment_df,
     comment_table_id,
-    job_config=bigquery.LoadJobConfig(write_disposition = 'WRITE_TRUNCATE')
+    job_config=bigquery.LoadJobConfig(write_disposition = 'WRITE_APPEND')
 )
-comment_job.result()
+
+comment_job.result()    
 print(f"Uploaded {len(comment_df)} posts to {comment_table_id}")

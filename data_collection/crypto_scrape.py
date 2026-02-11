@@ -31,10 +31,11 @@ BASE_URL = "https://api.binance.com/api/v3/klines"
 # FETCH DATA
 # -----------------------------
 def get_latest_timestamp(symbol):
-    query = F"""SELECT 
+    query = f"""SELECT 
                     MAX(open_time) as max_time
-                FROM '{project_id}.{dataset_id}.raw_crypto'
-                WHERE symbol = '{symbol}"""
+                FROM `{project_id}.{dataset_id}.raw_crypto`
+                WHERE symbol = '{symbol}'
+"""
     
     result = client.query(query).result()
     
